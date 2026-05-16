@@ -68,41 +68,55 @@ class MainActivity : AppCompatActivity() {
             val animalType = spinnerType.selectedItem.toString()
             // التحقق إذا كانت الحقول فارغة
 
-            if (
-                name.isEmpty() ||
-                age.isEmpty() ||
-                owner.isEmpty() ||
-                phoneNumber.isEmpty()
-            ) {
+          // التحقق إذا كانت الحقول فارغة
 
-                Toast.makeText(
-                    this,
-                    "Please fill all fields",
-                    Toast.LENGTH_SHORT
-                ).show()
+if (
+    name.isEmpty() ||
+    age.isEmpty() ||
+    owner.isEmpty() ||
+    phoneNumber.isEmpty()
+) {
 
-            } else {
+    Toast.makeText(
+        this,
+        "Please fill all fields",
+        Toast.LENGTH_SHORT
+    ).show()
 
-                // حفظ البيانات داخل قاعدة البيانات
+} else {
 
-                dbHelper.insertAnimal(
-                    name,
-                    animalType,
-                    breed,
-                    age.toInt(),
-                    owner,
-                    phoneNumber
-                )
+    val ageNumber = age.toInt()
 
-                Toast.makeText(
-                    this,
-                    "Pet saved successfully!",
-                    Toast.LENGTH_SHORT
-                ).show()
+    // التحقق من العمر
 
+    if (ageNumber <= 0 || ageNumber > 30) {
 
+        Toast.makeText(
+            this,
+            "Please enter a valid age",
+            Toast.LENGTH_SHORT
+        ).show()
 
-        }
+    } else {
+
+        // حفظ البيانات داخل قاعدة البيانات
+
+        dbHelper.insertAnimal(
+            name,
+            animalType,
+            breed,
+            age.toInt(),
+            owner,
+            phoneNumber
+        )
+
+        Toast.makeText(
+            this,
+            "Pet saved successfully!",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 }
 }
+}
+     }
