@@ -35,12 +35,43 @@ class DBHelper(context: Context) :
                 FOREIGN KEY (animal_id) REFERENCES animals(animal_id)
             );
         """)
+        db.execSQL("""
+    CREATE TABLE medications (
+        med_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        animal_id INTEGER,
+        name TEXT,
+        dosage TEXT,
+        date TEXT,
+        type TEXT,
+        FOREIGN KEY (animal_id) REFERENCES animals(animal_id)
+    );
+""")
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         db.execSQL("DROP TABLE IF EXISTS records")
         db.execSQL("DROP TABLE IF EXISTS animals")
         onCreate(db)
+    }
+
+
+//دالة إدخال دواء / لقاح
+    fun insertMedication(
+        animalId: Int,
+        name: String,
+        dosage: String,
+        date: String,
+        type: String
+    ) {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("animal_id", animalId)
+            put("name", name)
+            put("dosage", dosage)
+            put("date", date)
+            put("type", type)
+        }
+        db.insert("medications", null, values)
     }
 
     // ---------------- INSERT ANIMAL ----------------
@@ -81,5 +112,163 @@ class DBHelper(context: Context) :
             put("extra", extra)
         }
         db.insert("records", null, value)
+    }
+
+    fun searchAnimals(keyword: String): ArrayList<Animal> {
+
+        val list = ArrayList<Animal>()
+
+        val db = readableDatabase
+
+        val cursor = db.rawQuery(
+            """
+        SELECT * FROM animals
+        WHERE animal_name LIKE ?
+        OR owner_name LIKE ?
+        """,
+            arrayOf("%$keyword%", "%$keyword%")
+        )
+
+        if (cursor.moveToFirst()) {
+
+            do {
+
+                val animal = Animal(
+                    id = cursor.getInt(
+                        cursor.getColumnIndexOrThrow("animal_id")
+                    ),
+
+                    name = cursor.getString(
+                        cursor.getColumnIndexOrThrow("animal_name")
+                    ),
+
+                    species = cursor.getString(
+                        cursor.getColumnIndexOrThrow("species")
+                    ),
+
+                    owner = cursor.getString(
+                        cursor.getColumnIndexOrThrow("owner_name")
+                    )
+                )
+
+                list.add(animal)
+
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+
+        return list
+    }
+
+fun getAllAnimals(): ArrayList<Animal> {
+
+    val list = ArrayList<Animal>()
+
+    val db = readableDatabase
+
+    val cursor = db.rawQuery(
+        "SELECT * FROM animals",
+        null
+    )
+
+    if (cursor.moveToFirst()) {
+
+        do {
+
+            val animal = Animal(
+                id = cursor.getInt(
+                    cursor.getColumnIndexOrThrow("animal_id")
+                ),
+
+                name = cursor.getString(
+                    cursor.getColumnIndexOrThrow("animal_name")
+                ),
+
+                species = cursor.getString(
+                    cursor.getColumnIndexOrThrow("species")
+                ),
+
+                owner = cursor.getString(
+                    cursor.getColumnIndexOrThrow("owner_name")
+                )
+            )
+
+            list.add(animal)
+
+        } while (cursor.moveToNext())
+    }
+
+    cursor.close()
+
+    return list
+}
+
+
+
+    //لجلب السجلات الطبية الخاصة بحيوان معيّن
+    fun getRecordsByAnimal(animalId: Int): ArrayList<String> {
+
+        val list = ArrayList<String>()
+
+        val db = readableDatabase
+
+        val cursor = db.rawQuery(
+            """
+        SELECT * FROM records
+        WHERE animal_id = ?
+        """,
+            arrayOf(animalId.toString())
+        )
+
+        if (cursor.moveToFirst()) {
+
+            do {
+
+                val type = cursor.getString(
+                    cursor.getColumnIndexOrThrow("type")
+                )
+
+                val desc = cursor.getString(
+                    cursor.getColumnIndexOrThrow("description")
+                )
+
+                val date = cursor.getString(
+                    cursor.getColumnIndexOrThrow("date")
+                )
+
+                val record =
+                    "$type\n$desc\n$date"
+
+                list.add(record)
+
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+
+        return list
+    }
+
+    // جلب Eye Treatment فقط
+    fun getEyeTreatments(): ArrayList<String> {
+        val list = ArrayList<String>()
+        val db = readableDatabase
+
+        val cursor = db.rawQuery(
+            "SELECT type, description, date FROM records WHERE type = ?",
+            arrayOf("Eye Treatment")
+        )
+
+        while (cursor.moveToNext()) {
+            val type = cursor.getString(0)
+            val desc = cursor.getString(1)
+            val date = cursor.getString(2)
+
+            list.add("$type\n$desc\n$date")
+        }
+
+        cursor.close()
+        return list
     }
 }
