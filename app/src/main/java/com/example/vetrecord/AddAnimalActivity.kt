@@ -11,6 +11,10 @@ import android.widget.Button
 import android.widget.EditText
 
 
+import android.widget.ImageButton
+
+import android.content.Intent
+
 import android.widget.Toast
 class MainActivity : AppCompatActivity() {
 
@@ -34,6 +38,8 @@ class MainActivity : AppCompatActivity() {
         val saveButton = findViewById<Button>(R.id.btnSave)
         val spinnerType = findViewById<Spinner>(R.id.spinnerType)
 
+        val backButton = findViewById<ImageButton>(R.id.btnBack)
+
 
 
 
@@ -54,6 +60,26 @@ class MainActivity : AppCompatActivity() {
         spinnerType.adapter = adapter
         // عند الضغط على زر الحفظ
 
+
+
+
+backButton.setOnClickListener {
+
+    val intent = Intent(
+        this,
+        PetProfileActivity::class.java
+    )
+
+    startActivity(intent)
+
+    finish()
+}
+
+
+
+
+
+        
         saveButton.setOnClickListener {
 
 
