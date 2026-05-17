@@ -271,4 +271,14 @@ fun getAllAnimals(): ArrayList<Animal> {
         cursor.close()
         return list
     }
+    fun deleteAnimal(animalId: Int): Int {
+
+    val db = writableDatabase
+
+    return db.delete(
+        "animals",
+        "animal_id=?",
+        arrayOf(animalId.toString())
+    )
+}
 }
