@@ -35,6 +35,7 @@ class AddAnimalActivity : AppCompatActivity() {
         val ownerName = findViewById<EditText>(R.id.etOwnerName)
         val phone = findViewById<EditText>(R.id.etPhone)
         val notes = findViewById<EditText>(R.id.etNotes)
+        val animalId = findViewById<EditText>(R.id.etAnimalId)
 
         val saveButton = findViewById<Button>(R.id.btnSave)
         val deleteButton = findViewById<Button>(R.id.btnDelete)
@@ -84,7 +85,7 @@ backButton.setOnClickListener {
 
         deleteButton.setOnClickListener {
 
-    val idText = petAge.text.toString()
+   val idText = animalId.text.toString()
 
     if (idText.isEmpty()) {
 
@@ -120,7 +121,7 @@ backButton.setOnClickListener {
 
         updateButton.setOnClickListener {
 
-    val idText = petAge.text.toString()
+    val idText = animalId.text.toString()
 
     if (idText.isEmpty()) {
 
