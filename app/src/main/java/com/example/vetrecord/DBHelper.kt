@@ -281,35 +281,7 @@ fun getAllAnimals(): ArrayList<Animal> {
         arrayOf(animalId.toString())
     )
 }
-    fun updateAnimal(
-    animalId: Int,
-    name: String,
-    species: String,
-    breed: String,
-    age: Int,
-    owner: String,
-    phone: String
-): Int {
-
-    val db = writableDatabase
-
-    val values = ContentValues().apply {
-
-        put("animal_name", name)
-        put("species", species)
-        put("breed", breed)
-        put("age", age)
-        put("owner_name", owner)
-        put("owner_phone", phone)
-    }
-
-    return db.update(
-        "animals",
-        values,
-        "animal_id=?",
-        arrayOf(animalId.toString())
-    )
-}
+    
     fun updateAnimal(
     id: Int,
     name: String,
