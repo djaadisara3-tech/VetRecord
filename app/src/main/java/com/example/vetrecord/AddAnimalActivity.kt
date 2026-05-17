@@ -38,6 +38,7 @@ class AddAnimalActivity : AppCompatActivity() {
 
         val saveButton = findViewById<Button>(R.id.btnSave)
         val deleteButton = findViewById<Button>(R.id.btnDelete)
+        val updateButton = findViewById<Button>(R.id.btnUpdate)
         val spinnerType = findViewById<Spinner>(R.id.spinnerType)
 
         val backButton = findViewById<ImageButton>(R.id.btnBack)
@@ -110,6 +111,57 @@ backButton.setOnClickListener {
             Toast.makeText(
                 this,
                 "Animal not found",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+}
+
+
+        updateButton.setOnClickListener {
+
+    val idText = petAge.text.toString()
+
+    if (idText.isEmpty()) {
+
+        Toast.makeText(
+            this,
+            "Enter Animal ID",
+            Toast.LENGTH_SHORT
+        ).show()
+
+    } else {
+
+        val result = dbHelper.updateAnimal(
+
+            idText.toInt(),
+
+            petName.text.toString(),
+
+            spinnerType.selectedItem.toString(),
+
+            notes.text.toString(),
+
+            petAge.text.toString().toInt(),
+
+            ownerName.text.toString(),
+
+            phone.text.toString()
+        )
+
+        if (result > 0) {
+
+            Toast.makeText(
+                this,
+                "Pet updated successfully",
+                Toast.LENGTH_SHORT
+            ).show()
+
+        } else {
+
+            Toast.makeText(
+                this,
+                "Update failed",
                 Toast.LENGTH_SHORT
             ).show()
         }
