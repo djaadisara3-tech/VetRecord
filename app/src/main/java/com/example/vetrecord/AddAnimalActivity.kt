@@ -1,4 +1,4 @@
-package com.example.vetclinic
+package com.example.vetrecord
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -16,11 +16,12 @@ import android.widget.ImageButton
 import android.content.Intent
 
 import android.widget.Toast
-class MainActivity : AppCompatActivity() {
+class AddAnimalActivity : AppCompatActivity() {
+
 
     override fun onCreate(savedInstanceState: Bundle?) {//دالة تفتح عندما نفتح الشاشة
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)//استعمل ملف xml هذا كواجهة للشاشة
+       setContentView(R.layout.activity_add_animal)//استعمل ملف xml هذا كواجهة للشاشة
 
 
         // إنشاء قاعدة البيانات
@@ -36,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         val notes = findViewById<EditText>(R.id.etNotes)
 
         val saveButton = findViewById<Button>(R.id.btnSave)
+        val deleteButton = findViewById<Button>(R.id.btnDelete)
         val spinnerType = findViewById<Spinner>(R.id.spinnerType)
 
         val backButton = findViewById<ImageButton>(R.id.btnBack)
@@ -79,7 +81,40 @@ backButton.setOnClickListener {
 
 
 
-        
+        deleteButton.setOnClickListener {
+
+    val idText = petAge.text.toString()
+
+    if (idText.isEmpty()) {
+
+        Toast.makeText(
+            this,
+            "Enter Animal ID",
+            Toast.LENGTH_SHORT
+        ).show()
+
+    } else {
+
+        val result = dbHelper.deleteAnimal(idText.toInt())
+
+        if (result > 0) {
+
+            Toast.makeText(
+                this,
+                "Pet deleted successfully",
+                Toast.LENGTH_SHORT
+            ).show()
+
+        } else {
+
+            Toast.makeText(
+                this,
+                "Animal not found",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+}
         saveButton.setOnClickListener {
 
 
