@@ -6,122 +6,133 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
+    android:background="#FAF7F9"
     tools:context=".MainActivity">
-
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="18dp">
 
-<ImageButton
-    android:id="@+id/btnBack"
-    android:layout_width="48dp"
-    android:layout_height="48dp"
-    android:src="@android:drawable/ic_media_previous"
-    android:background="@android:color/transparent"
-    android:tint="#8D5B74"
-    android:layout_marginTop="8dp"
+        <!-- BACK BUTTON -->
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:src="@android:drawable/ic_media_previous"
+            android:background="@drawable/circle_button_bg"
+            app:tint="#8D5B74"
+            android:elevation="6dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
 
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintStart_toStartOf="parent"/>
-        
-
+        <!-- TITLE -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Pet Profile"
-            android:textSize="28sp"
+            android:text="add animals"
+            android:textSize="30sp"
             android:textStyle="bold"
             android:textColor="#8D5B74"
+            android:layout_marginTop="10dp"
             app:layout_constraintTop_toBottomOf="@id/btnBack"
             app:layout_constraintStart_toStartOf="parent"/>
 
-        <ImageView
-            android:id="@+id/imgPet"
-            android:layout_width="140dp"
-            android:layout_height="140dp"
-            android:src="@drawable/pet_image"
-            android:scaleType="centerCrop"
-            android:background="@drawable/circle_background"
-            android:clipToOutline="true"
-            android:layout_marginTop="24dp"
+        <!-- IMAGE CARD -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardImage"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_marginTop="22dp"
+            app:cardCornerRadius="75dp"
+            app:cardElevation="10dp"
             app:layout_constraintTop_toBottomOf="@id/tvTitle"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent">
 
+            <ImageView
+                android:id="@+id/imgPet"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/profile"
+                android:scaleType="centerCrop"/>
+        </androidx.cardview.widget.CardView>
+
+        <!-- PET NAME -->
         <EditText
             android:id="@+id/etPetName"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="55dp"
             android:hint="Pet Name"
+            android:textColor="#3A2B33"
+            android:textColorHint="#B9A8B0"
             android:padding="14dp"
-            android:background="@drawable/edittext_background"
-            android:layout_marginTop="24dp"
-            app:layout_constraintTop_toBottomOf="@id/imgPet"
+            android:background="@drawable/input_field_bg"
+            android:layout_marginTop="22dp"
+            app:layout_constraintTop_toBottomOf="@id/cardImage"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
+        <!-- TYPE -->
         <Spinner
             android:id="@+id/spinnerType"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@drawable/edittext_background"
-            android:padding="12dp"
-            android:layout_marginTop="16dp"
-
+            android:layout_height="55dp"
+            android:background="@drawable/input_field_bg"
+            android:layout_marginTop="14dp"
             app:layout_constraintTop_toBottomOf="@id/etPetName"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
-        <!-- حقل عمر الحيوان -->
 
+        <!-- AGE -->
         <EditText
             android:id="@+id/etAge"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="55dp"
             android:hint="Pet Age"
             android:inputType="number"
+            android:textColor="#3A2B33"
+            android:textColorHint="#B9A8B0"
             android:padding="14dp"
-            android:background="@drawable/edittext_background"
-            android:layout_marginTop="16dp"
+            android:background="@drawable/input_field_bg"
+            android:layout_marginTop="14dp"
             app:layout_constraintTop_toBottomOf="@id/spinnerType"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
-        <!-- اسم المالك -->
-
+        <!-- OWNER -->
         <EditText
             android:id="@+id/etOwnerName"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="55dp"
             android:hint="Owner Name"
+            android:textColor="#3A2B33"
+            android:textColorHint="#B9A8B0"
             android:padding="14dp"
-            android:background="@drawable/edittext_background"
-            android:layout_marginTop="16dp"
-
+            android:background="@drawable/input_field_bg"
+            android:layout_marginTop="14dp"
             app:layout_constraintTop_toBottomOf="@id/etAge"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
-        <!-- رقم الهاتف -->
-
+        <!-- PHONE -->
         <EditText
             android:id="@+id/etPhone"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="55dp"
             android:hint="Phone Number"
             android:inputType="phone"
+            android:textColor="#3A2B33"
+            android:textColorHint="#B9A8B0"
             android:padding="14dp"
-            android:background="@drawable/edittext_background"
-            android:layout_marginTop="16dp"
-
+            android:background="@drawable/input_field_bg"
+            android:layout_marginTop="14dp"
             app:layout_constraintTop_toBottomOf="@id/etOwnerName"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
-        <!-- ملاحظات أو تشخيص -->
-
+        <!-- NOTES -->
         <EditText
             android:id="@+id/etNotes"
             android:layout_width="0dp"
@@ -129,28 +140,28 @@
             android:hint="Diagnosis / Notes"
             android:gravity="top"
             android:inputType="textMultiLine"
+            android:textColor="#3A2B33"
+            android:textColorHint="#B9A8B0"
             android:padding="14dp"
-            android:background="@drawable/edittext_background"
-            android:layout_marginTop="16dp"
-
+            android:background="@drawable/input_field_bg"
+            android:layout_marginTop="14dp"
             app:layout_constraintTop_toBottomOf="@id/etPhone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
-        <!-- زر الحفظ -->
-
+        <!-- SAVE BUTTON -->
         <Button
             android:id="@+id/btnSave"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="58dp"
             android:text="Save Pet"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:padding="14dp"
             android:backgroundTint="#8D5B74"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="32dp"
-
+            android:elevation="8dp"
+            android:layout_marginTop="22dp"
+            android:layout_marginBottom="30dp"
             app:layout_constraintTop_toBottomOf="@id/etNotes"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>

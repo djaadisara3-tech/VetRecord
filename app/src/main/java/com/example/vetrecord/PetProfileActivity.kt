@@ -1,36 +1,42 @@
 package com.example.vetrecord
 
 import android.os.Bundle
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class PetProfileActivity : AppCompatActivity() {
+
+    lateinit var tvName: TextView
+    lateinit var tvSpecies: TextView
+    lateinit var tvOwner: TextView
+
+    lateinit var recycler: RecyclerView
+    lateinit var adapter: MedAdapter
+
+    lateinit var dbHelper: DBHelper
+
+    lateinit var btnAddMed: FloatingActionButton
+
+    var animalId: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pet_profile)
 
-        // =========================
-        // VIEWS
-        // =========================
-        val tvName = findViewById<TextView>(R.id.tvName)
-        val tvSpecies = findViewById<TextView>(R.id.tvSpecies)
-        val tvOwner = findViewById<TextView>(R.id.tvOwner)
+        // INIT VIEWS
+        tvName = findViewById(R.id.tvName)
+        tvSpecies = findViewById(R.id.tvSpecies)
+        tvOwner = findViewById(R.id.tvOwner)
+        recycler = findViewById(R.id.medRecycler)
+        btnAddMed = findViewById(R.id.btnAddMed)
 
-        val recordsContainer = findViewById<LinearLayout>(R.id.recordsContainer)
-        val medContainer = findViewById<LinearLayout>(R.id.medContainer)
+        dbHelper = DBHelper(this)
 
-        // =========================
-        // DATABASE
-        // =========================
-        val db = DBHelper(this).readableDatabase
-
-        // =========================
-        // GET ANIMAL ID
-        // =========================
-        val animalId = intent.getIntExtra("animal_id", -1)
+        animalId = intent.getIntExtra("animal_id", -1)
 
         if (animalId == -1) {
             Toast.makeText(this, "Animal ID missing", Toast.LENGTH_SHORT).show()
@@ -38,112 +44,118 @@ class PetProfileActivity : AppCompatActivity() {
             return
         }
 
-        // =========================
-        // ANIMAL INFO
-        // =========================
-        val animalCursor = db.rawQuery(
-            "SELECT animal_name, species, owner_name FROM animals WHERE animal_id = ?",
-            arrayOf(animalId.toString())
-        )
+        loadAnimalInfo()
+        loadMedications(animalId)
 
-        if (animalCursor.moveToFirst()) {
-            tvName.text = animalCursor.getString(0)
-            tvSpecies.text = animalCursor.getString(1)
-            tvOwner.text = "Owner: ${animalCursor.getString(2)}"
+        // =========================
+        // ADD MEDICATION DIALOG
+        // =========================
+        btnAddMed.setOnClickListener {
+
+            val inputName = EditText(this)
+            inputName.hint = "Medicine Name"
+
+            val inputDose = EditText(this)
+            inputDose.hint = "Dosage (e.g. 5ml)"
+
+            val inputDate = EditText(this)
+            inputDate.hint = "Date (2026-05-17)"
+
+            val layout = LinearLayout(this)
+            layout.orientation = LinearLayout.VERTICAL
+            layout.setPadding(40, 20, 40, 10)
+
+            layout.addView(inputName)
+            layout.addView(inputDose)
+            layout.addView(inputDate)
+
+            AlertDialog.Builder(this)
+                .setTitle("Add Medication / Vaccine")
+                .setView(layout)
+                .setPositiveButton("Save") { _, _ ->
+
+                    val db = dbHelper.writableDatabase
+
+                    db.execSQL(
+                        """
+                        INSERT INTO medications (animal_id, name, dosage, date, type)
+                        VALUES (?, ?, ?, ?, ?)
+                        """.trimIndent(),
+                        arrayOf(
+                            animalId,
+                            inputName.text.toString(),
+                            inputDose.text.toString(),
+                            inputDate.text.toString(),
+                            "Medicine"
+                        )
+                    )
+
+                    loadMedications(animalId)
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
         }
-        animalCursor.close()
+    }
 
-        // =========================
-        // MEDICAL RECORDS
-        // =========================
-        recordsContainer.removeAllViews()
+    // =========================
+    // LOAD ANIMAL INFO
+    // =========================
+    private fun loadAnimalInfo() {
 
-        val recordCursor = db.rawQuery(
-            "SELECT type, description, date FROM records WHERE animal_id = ? ORDER BY date DESC",
+        val db = dbHelper.readableDatabase
+
+        val cursor = db.rawQuery(
+            "SELECT animal_name, species, owner_name FROM animals WHERE animal_id=?",
             arrayOf(animalId.toString())
         )
 
-        while (recordCursor.moveToNext()) {
+        if (cursor.moveToFirst()) {
+            tvName.text = cursor.getString(0)
+            tvSpecies.text = cursor.getString(1)
+            tvOwner.text = "Owner: ${cursor.getString(2)}"
+        }
 
-            val card = LinearLayout(this)
-            card.orientation = LinearLayout.VERTICAL
-            card.setPadding(40, 30, 40, 30)
+        cursor.close()
+    }
 
-            val params = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
+    // =========================
+    // LOAD MEDICATIONS
+    // =========================
+    private fun loadMedications(animalId: Int) {
+
+        val list = ArrayList<Medication>()
+
+        val db = dbHelper.readableDatabase
+
+        val cursor = db.rawQuery(
+            """
+            SELECT med_id, animal_id, name, dosage, date, type
+            FROM medications
+            WHERE animal_id=?
+            ORDER BY date DESC
+            """.trimIndent(),
+            arrayOf(animalId.toString())
+        )
+
+        while (cursor.moveToNext()) {
+            list.add(
+                Medication(
+                    id = cursor.getInt(0),
+                    name = cursor.getString(2),
+                    dosage = cursor.getString(3),
+                    date = cursor.getString(4),
+                    type = cursor.getString(5)
+                )
             )
-            params.topMargin = 24
-            card.layoutParams = params
-
-            card.setBackgroundResource(R.drawable.white_card)
-
-            val tvType = TextView(this)
-            tvType.text = recordCursor.getString(0)
-            tvType.setTypeface(null, android.graphics.Typeface.BOLD)
-            tvType.textSize = 16f
-
-            val tvDesc = TextView(this)
-            tvDesc.text = recordCursor.getString(1)
-            tvDesc.textSize = 14f
-
-            val tvDate = TextView(this)
-            tvDate.text = recordCursor.getString(2)
-            tvDate.textSize = 12f
-
-            card.addView(tvType)
-            card.addView(tvDesc)
-            card.addView(tvDate)
-
-            recordsContainer.addView(card)
-        }
-        recordCursor.close()
-
-        // =========================
-        // MEDICATIONS + VACCINES
-        // =========================
-        medContainer.removeAllViews()
-
-        val medCursor = db.rawQuery(
-            "SELECT name, dosage, date, type FROM medications WHERE animal_id = ? ORDER BY date DESC",
-            arrayOf(animalId.toString())
-        )
-
-        while (medCursor.moveToNext()) {
-
-            val card = LinearLayout(this)
-            card.orientation = LinearLayout.VERTICAL
-            card.setPadding(40, 30, 40, 30)
-
-            val params = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            params.topMargin = 24
-            card.layoutParams = params
-
-            card.setBackgroundResource(R.drawable.white_card)
-
-            val tvTitle = TextView(this)
-            tvTitle.text = "${medCursor.getString(3)}: ${medCursor.getString(0)}"
-            tvTitle.setTypeface(null, android.graphics.Typeface.BOLD)
-            tvTitle.textSize = 16f
-
-            val tvDose = TextView(this)
-            tvDose.text = "Dose: ${medCursor.getString(1)}"
-            tvDose.textSize = 14f
-
-            val tvDate = TextView(this)
-            tvDate.text = medCursor.getString(2)
-            tvDate.textSize = 12f
-
-            card.addView(tvTitle)
-            card.addView(tvDose)
-            card.addView(tvDate)
-
-            medContainer.addView(card)
         }
 
-        medCursor.close()
+        cursor.close()
+
+        adapter = MedAdapter(list, dbHelper) {
+            loadMedications(animalId)
+        }
+
+        recycler.layoutManager = LinearLayoutManager(this)
+        recycler.adapter = adapter
     }
 }

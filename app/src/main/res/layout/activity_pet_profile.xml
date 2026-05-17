@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF8FA">
+    android:background="#FFF8FA"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,8 +17,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <ImageView
                 android:layout_width="26dp"
@@ -31,22 +32,22 @@
                 android:layout_weight="1"
                 android:text="Pet Profile"
                 android:textAlignment="center"
-                android:textStyle="bold"
                 android:textColor="#4B3B4F"
-                android:textSize="22sp" />
+                android:textSize="22sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- IMAGE -->
+        <!-- PET IMAGE -->
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imgPet"
             android:layout_width="120dp"
             android:layout_height="120dp"
             android:layout_gravity="center"
             android:layout_marginTop="24dp"
-            android:src="@drawable/profile"
-            android:scaleType="centerCrop"
             android:background="@drawable/profile_bg"
             android:padding="4dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/profile"
             app:shapeAppearanceOverlay="@style/circleImage" />
 
         <!-- NAME -->
@@ -54,100 +55,83 @@
             android:id="@+id/tvName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textSize="26sp"
-            android:textColor="#4B3B4F"
             android:layout_gravity="center"
-            android:layout_marginTop="14dp" />
+            android:layout_marginTop="14dp"
+            android:textColor="#4B3B4F"
+            android:textSize="26sp"
+            android:textStyle="bold" />
 
         <!-- SPECIES -->
         <TextView
             android:id="@+id/tvSpecies"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:textColor="#9C8B9C"
             android:layout_gravity="center"
-            android:layout_marginTop="4dp" />
+            android:layout_marginTop="4dp"
+            android:textColor="#9C8B9C"
+            android:textSize="15sp" />
 
         <!-- OWNER -->
         <TextView
             android:id="@+id/tvOwner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textColor="#C2A9B5"
             android:layout_gravity="center"
-            android:layout_marginTop="3dp" />
+            android:layout_marginTop="3dp"
+            android:textColor="#C2A9B5"
+            android:textSize="14sp" />
 
-        <!-- APPOINTMENT -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="28dp"
-            android:background="@drawable/card_bg"
-            android:padding="20dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Upcoming Appointment"
-                android:textColor="#F8EFFF"
-                android:textSize="12sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="General Check-up"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold"
-                android:textSize="21sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="21 April • 09:00 AM"
-                android:textColor="#F5E8F0"
-                android:textSize="13sp" />
-        </LinearLayout>
-
-        <!-- MEDICAL RECORDS TITLE -->
+        <!-- MEDICAL RECORDS -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
             android:text="Medical Records"
-            android:textStyle="bold"
-            android:textSize="20sp"
             android:textColor="#4B3B4F"
-            android:layout_marginTop="30dp" />
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-        <!-- RECORDS CONTAINER -->
         <LinearLayout
             android:id="@+id/recordsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="10dp"
+            android:orientation="vertical" />
 
-        <!-- MEDICATIONS TITLE -->
+        <!-- MEDICATIONS -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
             android:text="Medications &amp; Vaccines"
-            android:textStyle="bold"
-            android:textSize="20sp"
             android:textColor="#4B3B4F"
-            android:layout_marginTop="30dp" />
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-        <!-- MEDICATION CONTAINER -->
-        <LinearLayout
-            android:id="@+id/medContainer"
+        <!-- ✅ RecyclerView (واحد فقط) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/medRecycler"
             android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="10dp"
+            android:nestedScrollingEnabled="false" />
+
+        <!-- SAVE BUTTON -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnAddMed"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="10dp" />
+            android:layout_gravity="end"
+            android:layout_margin="16dp"
+            android:src="@android:drawable/ic_input_add"
+            app:backgroundTint="#8E6B8F"
+            app:tint="#FFFFFF"/>
 
     </LinearLayout>
 
 </ScrollView>
+
+
+
+
+
