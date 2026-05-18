@@ -6,11 +6,16 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
 class DBHelper(context: Context) :
-    SQLiteOpenHelper(context, "vet_clinic.db", null, 1) {
+    SQLiteOpenHelper(context, "vet_clinic.db", null, 2){
 
+    // =================================================
+    // CREATE DATABASE
+    // =================================================
     override fun onCreate(db: SQLiteDatabase) {
 
-        db.execSQL("""
+        // ================= ANIMALS =================
+        db.execSQL(
+            """
             CREATE TABLE animals (
                 animal_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 animal_name TEXT,
@@ -20,9 +25,12 @@ class DBHelper(context: Context) :
                 owner_name TEXT,
                 owner_phone TEXT
             );
-        """)
+            """.trimIndent()
+        )
 
-        db.execSQL("""
+        // ================= RECORDS =================
+        db.execSQL(
+            """
             CREATE TABLE records (
                 record_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 animal_id INTEGER,
@@ -31,9 +39,12 @@ class DBHelper(context: Context) :
                 date TEXT,
                 extra TEXT
             );
-        """)
+            """.trimIndent()
+        )
 
-        db.execSQL("""
+        // ================= MEDICATIONS =================
+        db.execSQL(
+            """
             CREATE TABLE medications (
                 med_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 animal_id INTEGER,
@@ -42,59 +53,29 @@ class DBHelper(context: Context) :
                 date TEXT,
                 type TEXT
             );
-        """)
-    }
-
-    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("DROP TABLE IF EXISTS animals")
-        db.execSQL("DROP TABLE IF EXISTS records")
-        db.execSQL("DROP TABLE IF EXISTS medications")
-        onCreate(db)
-    }
-
-    // ================= MEDICATION =================
-
-    fun insertMedication(
-        animalId: Int,
-        name: String,
-        dosage: String,
-        date: String,
-        type: String
-    ) {
-        val db = writableDatabase
-        val values = ContentValues().apply {
-            put("animal_id", animalId)
-            put("name", name)
-            put("dosage", dosage)
-            put("date", date)
-            put("type", type)
-        }
-        db.insert("medications", null, values)
-    }
-
-    fun updateMedication(id: Int, name: String, dosage: String): Int {
-        val db = writableDatabase
-
-        val values = ContentValues().apply {
-            put("name", name)
-            put("dosage", dosage)
-        }
-
-        return db.update(
-            "medications",
-            values,
-            "med_id=?",
-            arrayOf(id.toString())
+            """.trimIndent()
         )
     }
 
-    fun deleteMedication(id: Int): Int {
-        val db = writableDatabase
-        return db.delete("medications", "med_id=?", arrayOf(id.toString()))
+    // =================================================
+    // UPGRADE DATABASE
+    // =================================================
+    override fun onUpgrade(
+        db: SQLiteDatabase,
+        oldVersion: Int,
+        newVersion: Int
+    ) {
+
+        db.execSQL("DROP TABLE IF EXISTS animals")
+        db.execSQL("DROP TABLE IF EXISTS records")
+        db.execSQL("DROP TABLE IF EXISTS medications")
+
+        onCreate(db)
     }
 
-    // ================= ANIMAL =================
-
+    // =================================================
+    // INSERT ANIMAL
+    // =================================================
     fun insertAnimal(
         name: String,
         species: String,
@@ -103,9 +84,10 @@ class DBHelper(context: Context) :
         owner: String,
         phone: String
     ) {
+
         val db = writableDatabase
 
-        val value = ContentValues().apply {
+        val values = ContentValues().apply {
             put("animal_name", name)
             put("species", species)
             put("breed", breed)
@@ -114,9 +96,12 @@ class DBHelper(context: Context) :
             put("owner_phone", phone)
         }
 
-        db.insert("animals", null, value)
+        db.insert("animals", null, values)
     }
 
+    // =================================================
+    // UPDATE ANIMAL
+    // =================================================
     fun updateAnimal(
         id: Int,
         name: String,
@@ -146,13 +131,23 @@ class DBHelper(context: Context) :
         )
     }
 
+    // =================================================
+    // DELETE ANIMAL
+    // =================================================
     fun deleteAnimal(id: Int): Int {
+
         val db = writableDatabase
-        return db.delete("animals", "animal_id=?", arrayOf(id.toString()))
+
+        return db.delete(
+            "animals",
+            "animal_id=?",
+            arrayOf(id.toString())
+        )
     }
 
-    // ================= RECORDS =================
-
+    // =================================================
+    // INSERT RECORD
+    // =================================================
     fun insertRecord(
         animalId: Int,
         type: String,
@@ -160,9 +155,10 @@ class DBHelper(context: Context) :
         date: String,
         extra: String
     ) {
+
         val db = writableDatabase
 
-        val value = ContentValues().apply {
+        val values = ContentValues().apply {
             put("animal_id", animalId)
             put("type", type)
             put("description", desc)
@@ -170,22 +166,36 @@ class DBHelper(context: Context) :
             put("extra", extra)
         }
 
-        db.insert("records", null, value)
+        db.insert("records", null, values)
     }
 
-    fun getRecordsByAnimal(animalId: Int): ArrayList<String> {
+    // =================================================
+    // GET RECORDS
+    // =================================================
+    fun getRecordsByAnimalId(animalId: Int): ArrayList<Record> {
 
-        val list = ArrayList<String>()
+        val list = ArrayList<Record>()
         val db = readableDatabase
 
         val cursor = db.rawQuery(
-            "SELECT type, description, date FROM records WHERE animal_id=?",
+            """
+            SELECT record_id, type, description, date
+            FROM records
+            WHERE animal_id=?
+            ORDER BY date DESC
+            """.trimIndent(),
             arrayOf(animalId.toString())
         )
 
         while (cursor.moveToNext()) {
+
             list.add(
-                "${cursor.getString(0)}\n${cursor.getString(1)}\n${cursor.getString(2)}"
+                Record(
+                    id = cursor.getInt(0),
+                    type = cursor.getString(1),
+                    description = cursor.getString(2),
+                    date = cursor.getString(3)
+                )
             )
         }
 
@@ -193,8 +203,148 @@ class DBHelper(context: Context) :
         return list
     }
 
-    // ================= SEARCH =================
+    // =================================================
+    // UPDATE RECORD
+    // =================================================
+    fun updateRecord(
+        id: Int,
+        type: String,
+        description: String,
+        date: String
+    ): Int {
 
+        val db = writableDatabase
+
+        val values = ContentValues().apply {
+            put("type", type)
+            put("description", description)
+            put("date", date)
+        }
+
+        return db.update(
+            "records",
+            values,
+            "record_id=?",
+            arrayOf(id.toString())
+        )
+    }
+
+    // =================================================
+    // DELETE RECORD
+    // =================================================
+    fun deleteRecord(id: Int): Int {
+
+        val db = writableDatabase
+
+        return db.delete(
+            "records",
+            "record_id=?",
+            arrayOf(id.toString())
+        )
+    }
+
+    // =================================================
+    // INSERT MEDICATION
+    // =================================================
+    fun insertMedication(
+        animalId: Int,
+        name: String,
+        dosage: String,
+        date: String,
+        type: String
+    ) {
+
+        val db = writableDatabase
+
+        val values = ContentValues().apply {
+            put("animal_id", animalId)
+            put("name", name)
+            put("dosage", dosage)
+            put("date", date)
+            put("type", type)
+        }
+
+        db.insert("medications", null, values)
+    }
+
+    // =================================================
+    // UPDATE MEDICATION
+    // =================================================
+    fun updateMedication(
+        id: Int,
+        name: String,
+        dosage: String
+    ): Int {
+
+        val db = writableDatabase
+
+        val values = ContentValues().apply {
+            put("name", name)
+            put("dosage", dosage)
+        }
+
+        return db.update(
+            "medications",
+            values,
+            "med_id=?",
+            arrayOf(id.toString())
+        )
+    }
+
+    // =================================================
+    // DELETE MEDICATION
+    // =================================================
+    fun deleteMedication(id: Int): Int {
+
+        val db = writableDatabase
+
+        return db.delete(
+            "medications",
+            "med_id=?",
+            arrayOf(id.toString())
+        )
+    }
+
+    // =================================================
+    // GET ALL ANIMALS
+    // =================================================
+    fun getAllAnimals(): ArrayList<Animal> {
+
+        val list = ArrayList<Animal>()
+        val db = readableDatabase
+
+        val cursor = db.rawQuery(
+            "SELECT * FROM animals",
+            null
+        )
+
+        while (cursor.moveToNext()) {
+
+            list.add(
+                Animal(
+                    id = cursor.getInt(
+                        cursor.getColumnIndexOrThrow("animal_id")
+                    ),
+                    name = cursor.getString(
+                        cursor.getColumnIndexOrThrow("animal_name")
+                    ),
+                    species = cursor.getString(
+                        cursor.getColumnIndexOrThrow("species")
+                    ),
+                    owner = cursor.getString(
+                        cursor.getColumnIndexOrThrow("owner_name")
+                    )
+                )
+            )
+        }
+
+        cursor.close()
+        return list
+    }
+
+    // =================================================
+    // SEARCH ANIMALS
+    // =================================================
     fun searchAnimals(keyword: String): ArrayList<Animal> {
 
         val list = ArrayList<Animal>()
@@ -205,7 +355,7 @@ class DBHelper(context: Context) :
             SELECT * FROM animals
             WHERE animal_name LIKE ?
             OR owner_name LIKE ?
-            """,
+            """.trimIndent(),
             arrayOf("%$keyword%", "%$keyword%")
         )
 
@@ -213,66 +363,22 @@ class DBHelper(context: Context) :
 
             list.add(
                 Animal(
-                    id = cursor.getInt(0),
-                    name = cursor.getString(1),
-                    species = cursor.getString(2),
-                    owner = cursor.getString(5)
-                )
-            )
-        }
-
-        cursor.close()
-        return list
-    }
-
-    fun getAllAnimals(): ArrayList<Animal> {
-
-        val list = ArrayList<Animal>()
-        val db = readableDatabase
-
-        val cursor = db.rawQuery("SELECT * FROM animals", null)
-
-        while (cursor.moveToNext()) {
-
-            list.add(
-                Animal(
-                    id = cursor.getInt(0),
-                    name = cursor.getString(1),
-                    species = cursor.getString(2),
-                    owner = cursor.getString(5)
-                )
-            )
-        }
-
-        //get recorde
-        fun getRecordsByAnimalId(animalId: Int): ArrayList<Record> {
-
-            val list = ArrayList<Record>()
-            val db = readableDatabase
-
-            val cursor = db.rawQuery(
-                """
-        SELECT type, description, date
-        FROM records
-        WHERE animal_id=?
-        ORDER BY date DESC
-        """.trimIndent(),
-                arrayOf(animalId.toString())
-            )
-
-            while (cursor.moveToNext()) {
-                list.add(
-                    Record(
-                        type = cursor.getString(0),
-                        description = cursor.getString(1),
-                        date = cursor.getString(2)
+                    id = cursor.getInt(
+                        cursor.getColumnIndexOrThrow("animal_id")
+                    ),
+                    name = cursor.getString(
+                        cursor.getColumnIndexOrThrow("animal_name")
+                    ),
+                    species = cursor.getString(
+                        cursor.getColumnIndexOrThrow("species")
+                    ),
+                    owner = cursor.getString(
+                        cursor.getColumnIndexOrThrow("owner_name")
                     )
                 )
-            }
-
-            cursor.close()
-            return list
+            )
         }
+
         cursor.close()
         return list
     }

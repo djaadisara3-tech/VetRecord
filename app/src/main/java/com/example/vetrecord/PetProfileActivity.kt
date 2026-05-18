@@ -1,5 +1,6 @@
 package com.example.vetrecord
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
@@ -21,7 +22,7 @@ class PetProfileActivity : AppCompatActivity() {
     lateinit var recordAdapter: RecordAdapter
 
     lateinit var dbHelper: DBHelper
-    lateinit var btnAddMed: FloatingActionButton
+    lateinit var btnAdd: FloatingActionButton
 
     var animalId: Int = -1
 
@@ -29,7 +30,11 @@ class PetProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pet_profile)
 
-        // ================= INIT VIEWS =================
+        // ================= ACTION BAR BACK =================
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+
+        // ================= INIT =================
         tvName = findViewById(R.id.tvName)
         tvSpecies = findViewById(R.id.tvSpecies)
         tvOwner = findViewById(R.id.tvOwner)
@@ -37,7 +42,7 @@ class PetProfileActivity : AppCompatActivity() {
         medRecycler = findViewById(R.id.medRecycler)
         recordRecycler = findViewById(R.id.recordRecycler)
 
-        btnAddMed = findViewById(R.id.btnAddMed)
+        btnAdd = findViewById(R.id.btnAddMed)
 
         dbHelper = DBHelper(this)
 
@@ -49,52 +54,110 @@ class PetProfileActivity : AppCompatActivity() {
             return
         }
 
-        // ================= LOAD DATA =================
         loadAnimalInfo()
         loadMedications(animalId)
         loadRecords(animalId)
 
-        // ================= ADD MEDICATION =================
-        btnAddMed.setOnClickListener {
+        btnAdd.setOnClickListener {
 
-            val inputName = EditText(this)
-            inputName.hint = "Medicine Name"
-
-            val inputDose = EditText(this)
-            inputDose.hint = "Dosage (e.g. 5ml)"
-
-            val inputDate = EditText(this)
-            inputDate.hint = "Date (2026-05-17)"
-
-            val layout = LinearLayout(this)
-            layout.orientation = LinearLayout.VERTICAL
-            layout.setPadding(40, 20, 40, 10)
-
-            layout.addView(inputName)
-            layout.addView(inputDose)
-            layout.addView(inputDate)
+            val options = arrayOf("Add Medication", "Add Medical Record")
 
             AlertDialog.Builder(this)
-                .setTitle("Add Medication")
-                .setView(layout)
-                .setPositiveButton("Save") { _, _ ->
+                .setTitle("Choose Action")
+                .setItems(options) { _, which ->
 
-                    dbHelper.insertMedication(
-                        animalId,
-                        inputName.text.toString(),
-                        inputDose.text.toString(),
-                        inputDate.text.toString(),
-                        "Medicine"
-                    )
+                    when (which) {
 
-                    loadMedications(animalId)
+                        0 -> addMedicationDialog()
+                        1 -> addRecordDialog()
+                    }
                 }
-                .setNegativeButton("Cancel", null)
                 .show()
         }
     }
 
-    // ================= ANIMAL INFO =================
+    // ================= BACK BUTTON FIX =================
+    override fun onSupportNavigateUp(): Boolean {
+
+        val intent = Intent(this, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+        finish()
+
+        return true
+    }
+
+    // ================= MEDICATION DIALOG =================
+    private fun addMedicationDialog() {
+
+        val name = EditText(this).apply { hint = "Medicine Name" }
+        val dose = EditText(this).apply { hint = "Dosage 5ml" }
+        val date = EditText(this).apply { hint = "Date 2026-05-18" }
+
+        val layout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(40, 20, 40, 10)
+
+            addView(name)
+            addView(dose)
+            addView(date)
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Add Medication")
+            .setView(layout)
+            .setPositiveButton("Save") { _, _ ->
+
+                dbHelper.insertMedication(
+                    animalId,
+                    name.text.toString(),
+                    dose.text.toString(),
+                    date.text.toString(),
+                    "Medicine"
+                )
+
+                loadMedications(animalId)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    // ================= RECORD DIALOG =================
+    private fun addRecordDialog() {
+
+        val type = EditText(this).apply { hint = "Type (Checkup / Surgery)" }
+        val desc = EditText(this).apply { hint = "Description" }
+        val date = EditText(this).apply { hint = "Date" }
+
+        val layout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(40, 20, 40, 10)
+
+            addView(type)
+            addView(desc)
+            addView(date)
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Add Medical Record")
+            .setView(layout)
+            .setPositiveButton("Save") { _, _ ->
+
+                dbHelper.insertRecord(
+                    animalId,
+                    type.text.toString(),
+                    desc.text.toString(),
+                    date.text.toString(),
+                    ""
+                )
+
+                loadRecords(animalId)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    // ================= LOAD ANIMAL =================
     private fun loadAnimalInfo() {
 
         val db = dbHelper.readableDatabase
@@ -132,11 +195,11 @@ class PetProfileActivity : AppCompatActivity() {
         while (cursor.moveToNext()) {
             list.add(
                 Medication(
-                    id = cursor.getInt(0),
-                    name = cursor.getString(1),
-                    dosage = cursor.getString(2),
-                    date = cursor.getString(3),
-                    type = cursor.getString(4)
+                    cursor.getInt(0),
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    cursor.getString(3),
+                    cursor.getString(4)
                 )
             )
         }
@@ -154,27 +217,11 @@ class PetProfileActivity : AppCompatActivity() {
     // ================= RECORDS =================
     private fun loadRecords(animalId: Int) {
 
-        val list = ArrayList<Record>()
-        val db = dbHelper.readableDatabase
+        val list = dbHelper.getRecordsByAnimalId(animalId)
 
-        val cursor = db.rawQuery(
-            "SELECT type, description, date FROM records WHERE animal_id=?",
-            arrayOf(animalId.toString())
-        )
-
-        while (cursor.moveToNext()) {
-            list.add(
-                Record(
-                    type = cursor.getString(0),
-                    description = cursor.getString(1),
-                    date = cursor.getString(2)
-                )
-            )
+        recordAdapter = RecordAdapter(list, dbHelper) {
+            loadRecords(animalId)
         }
-
-        cursor.close()
-
-        recordAdapter = RecordAdapter(list)
 
         recordRecycler.layoutManager = LinearLayoutManager(this)
         recordRecycler.adapter = recordAdapter

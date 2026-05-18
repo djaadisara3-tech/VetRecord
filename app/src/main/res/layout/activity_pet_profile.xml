@@ -13,18 +13,21 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- TOP BAR -->
+
+        <!-- ================= TOP BAR ================= -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <ImageView
+            <ImageButton
+                android:id="@+id/btnBack"
                 android:layout_width="26dp"
                 android:layout_height="26dp"
+                android:background="@android:color/transparent"
                 android:src="@android:drawable/ic_media_previous"
-                app:tint="#8E6B8F" />
+                app:tint="#A45C73" />
 
             <TextView
                 android:layout_width="0dp"
@@ -37,7 +40,7 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- PET IMAGE -->
+        <!-- ================= PET IMAGE ================= -->
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imgPet"
             android:layout_width="120dp"
@@ -50,7 +53,7 @@
             android:src="@drawable/profile"
             app:shapeAppearanceOverlay="@style/circleImage" />
 
-        <!-- NAME -->
+        <!-- ================= NAME ================= -->
         <TextView
             android:id="@+id/tvName"
             android:layout_width="wrap_content"
@@ -61,62 +64,63 @@
             android:textSize="26sp"
             android:textStyle="bold" />
 
-        <!-- SPECIES -->
+        <!-- ================= SPECIES ================= -->
         <TextView
             android:id="@+id/tvSpecies"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="4dp"
-            android:textColor="#9C8B9C"
+            android:textColor="#7A6A8A"
             android:textSize="15sp" />
 
-        <!-- OWNER -->
+        <!-- ================= OWNER ================= -->
         <TextView
             android:id="@+id/tvOwner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="3dp"
-            android:textColor="#C2A9B5"
+            android:textColor="#9C8B9C"
             android:textSize="14sp" />
 
-        <!-- MEDICAL RECORDS -->
+
+        <TextView
+            android:id="@+id/tvPhone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="#9C8B9C"
+            android:textSize="14sp" />
 
 
+        <!-- ================= SECTION TITLE ================= -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:text="Medical Records"
-            android:textColor="#4B3B4F"
-            android:textSize="20sp"
+            android:textColor="#A45C73"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
+        <!-- RECORDS -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recordRecycler"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_marginTop="10dp"
-            android:nestedScrollingEnabled="false"/>
-        <LinearLayout
-            android:id="@+id/recordsContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:orientation="vertical" />
+            android:nestedScrollingEnabled="false" />
 
-        <!-- MEDICATIONS -->
+        <!-- ================= SECTION TITLE ================= -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:text="Medications &amp; Vaccines"
-            android:textColor="#4B3B4F"
-            android:textSize="20sp"
+            android:textColor="#A45C73"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
-        <!-- ✅ RecyclerView (واحد فقط) -->
+        <!-- MEDICATIONS -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/medRecycler"
             android:layout_width="match_parent"
@@ -124,19 +128,22 @@
             android:layout_marginTop="10dp"
             android:nestedScrollingEnabled="false" />
 
-        <!-- SAVE BUTTON -->
+        <!-- ================= FLOAT BUTTON ================= -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btnAddMed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:layout_margin="16dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
             android:src="@android:drawable/ic_input_add"
-            app:backgroundTint="#8E6B8F"
-            app:tint="#FFFFFF"/>
+            app:backgroundTint="#A45C73"
+            app:tint="#FFFFFF" />
 
 
     </LinearLayout>
+
+
 
 </ScrollView>
 

@@ -1,9 +1,9 @@
 package com.example.vetrecord
 
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import android.widget.*
 import android.content.Intent
+import android.os.Bundle
+import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 
 class AddAnimalActivity : AppCompatActivity() {
 
@@ -11,90 +11,59 @@ class AddAnimalActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_animal)
 
+        // ================= DATABASE =================
         val dbHelper = DBHelper(this)
 
+        // ================= INPUTS =================
         val petName = findViewById<EditText>(R.id.etPetName)
         val petAge = findViewById<EditText>(R.id.etAge)
         val ownerName = findViewById<EditText>(R.id.etOwnerName)
         val phone = findViewById<EditText>(R.id.etPhone)
         val breed = findViewById<EditText>(R.id.etNotes)
-        val animalId = findViewById<EditText>(R.id.etAnimalId)
 
+        // ================= BUTTON =================
         val saveButton = findViewById<Button>(R.id.btnSave)
-        val deleteButton = findViewById<Button>(R.id.btnDelete)
-        val updateButton = findViewById<Button>(R.id.btnUpdate)
-        val spinnerType = findViewById<Spinner>(R.id.spinnerType)
         val backButton = findViewById<ImageButton>(R.id.btnBack)
+
+        // ================= SPINNER =================
+        val spinnerType = findViewById<Spinner>(R.id.spinnerType)
 
         val petTypes = arrayOf("Dog", "Cat", "Bird", "Rabbit")
 
         val adapter = ArrayAdapter(
             this,
-            android.R.layout.simple_spinner_dropdown_item,
+            R.layout.spinner_item,
             petTypes
         )
 
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
         spinnerType.adapter = adapter
 
+        // ================= BACK BUTTON =================
         backButton.setOnClickListener {
-            startActivity(Intent(this, PetProfileActivity::class.java))
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
             finish()
         }
 
-        // ================= DELETE =================
-        deleteButton.setOnClickListener {
+       //edit
+        val intent = intent
 
-            val idText = animalId.text.toString()
+        val id = intent.getIntExtra("id", -1)
+        val oldName = intent.getStringExtra("name")
+        val oldSpecies = intent.getStringExtra("species")
+        val oldOwner = intent.getStringExtra("owner")
 
-            if (idText.isEmpty()) {
-                Toast.makeText(this, "Enter Animal ID", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val result = dbHelper.deleteAnimal(idText.toInt())
-
-            Toast.makeText(
-                this,
-                if (result > 0) "Deleted successfully" else "Not found",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-
-        // ================= UPDATE =================
-        updateButton.setOnClickListener {
-
-            val idText = animalId.text.toString()
-
-            if (idText.isEmpty()) {
-                Toast.makeText(this, "Enter Animal ID", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val result = dbHelper.updateAnimal(
-                idText.toInt(),
-                petName.text.toString(),
-                spinnerType.selectedItem.toString(), // species
-                breed.text.toString(),               // breed
-                petAge.text.toString().toInt(),
-                ownerName.text.toString(),
-                phone.text.toString()
-            )
-
-            Toast.makeText(
-                this,
-                if (result > 0) "Updated successfully" else "Update failed",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
 
         // ================= SAVE =================
         saveButton.setOnClickListener {
 
-            val name = petName.text.toString()
-            val age = petAge.text.toString()
-            val owner = ownerName.text.toString()
-            val phoneNumber = phone.text.toString()
-            val breedText = breed.text.toString()
+            val name = petName.text.toString().trim()
+            val age = petAge.text.toString().trim()
+            val owner = ownerName.text.toString().trim()
+            val phoneNumber = phone.text.toString().trim()
+            val breedText = breed.text.toString().trim()
             val type = spinnerType.selectedItem.toString()
 
             if (name.isEmpty() || age.isEmpty() || owner.isEmpty() || phoneNumber.isEmpty()) {
@@ -111,7 +80,15 @@ class AddAnimalActivity : AppCompatActivity() {
                 phoneNumber
             )
 
-            Toast.makeText(this, "Saved successfully!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Animal saved successfully!", Toast.LENGTH_SHORT).show()
+
+            // clear
+            petName.text.clear()
+            petAge.text.clear()
+            ownerName.text.clear()
+            phone.text.clear()
+            breed.text.clear()
+            spinnerType.setSelection(0)
         }
     }
 }

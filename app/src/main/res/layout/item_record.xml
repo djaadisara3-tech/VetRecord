@@ -1,30 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="12dp"
-    android:background="@drawable/input_field_bg"
-    android:layout_marginBottom="8dp">
+    android:layout_marginBottom="10dp"
+    card_view:cardCornerRadius="16dp"
+    card_view:cardElevation="6dp"
+    card_view:cardBackgroundColor="#F6E9EE">
 
-    <TextView
-        android:id="@+id/tvType"
-        android:textStyle="bold"
-        android:textColor="#4B3B4F"
-        android:textSize="16sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="14dp"
+        android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/tvDesc"
-        android:textColor="#6B5A6F"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        <!-- LEFT CONTENT -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tvDate"
-        android:textColor="#9C8B9C"
-        android:textSize="12sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-</LinearLayout>
+            <TextView
+                android:id="@+id/tvType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Checkup"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#A45C73"/>
+
+            <TextView
+                android:id="@+id/tvDesc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="General health check"
+                android:textSize="14sp"
+                android:textColor="#6B5A6F"
+                android:layout_marginTop="4dp"/>
+
+            <TextView
+                android:id="@+id/tvDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2026-05-18"
+                android:textSize="12sp"
+                android:textColor="#8E6B8F"
+                android:layout_marginTop="6dp"/>
+
+        </LinearLayout>
+
+        <!-- RIGHT MENU (3 DOTS) -->
+        <ImageView
+            android:id="@+id/btnMenu"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:src="@android:drawable/ic_menu_more"
+            android:tint="#A45C73"
+            android:padding="4dp"
+            android:layout_gravity="center"/>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
