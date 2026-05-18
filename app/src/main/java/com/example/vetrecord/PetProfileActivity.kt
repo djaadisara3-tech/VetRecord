@@ -14,11 +14,13 @@ class PetProfileActivity : AppCompatActivity() {
     lateinit var tvSpecies: TextView
     lateinit var tvOwner: TextView
 
-    lateinit var recycler: RecyclerView
-    lateinit var adapter: MedAdapter
+    lateinit var medRecycler: RecyclerView
+    lateinit var recordRecycler: RecyclerView
+
+    lateinit var medAdapter: MedAdapter
+    lateinit var recordAdapter: RecordAdapter
 
     lateinit var dbHelper: DBHelper
-
     lateinit var btnAddMed: FloatingActionButton
 
     var animalId: Int = -1
@@ -27,11 +29,14 @@ class PetProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pet_profile)
 
-        // INIT VIEWS
+        // ================= INIT VIEWS =================
         tvName = findViewById(R.id.tvName)
         tvSpecies = findViewById(R.id.tvSpecies)
         tvOwner = findViewById(R.id.tvOwner)
-        recycler = findViewById(R.id.medRecycler)
+
+        medRecycler = findViewById(R.id.medRecycler)
+        recordRecycler = findViewById(R.id.recordRecycler)
+
         btnAddMed = findViewById(R.id.btnAddMed)
 
         dbHelper = DBHelper(this)
@@ -44,12 +49,12 @@ class PetProfileActivity : AppCompatActivity() {
             return
         }
 
+        // ================= LOAD DATA =================
         loadAnimalInfo()
         loadMedications(animalId)
+        loadRecords(animalId)
 
-        // =========================
-        // ADD MEDICATION DIALOG
-        // =========================
+        // ================= ADD MEDICATION =================
         btnAddMed.setOnClickListener {
 
             val inputName = EditText(this)
@@ -70,24 +75,16 @@ class PetProfileActivity : AppCompatActivity() {
             layout.addView(inputDate)
 
             AlertDialog.Builder(this)
-                .setTitle("Add Medication / Vaccine")
+                .setTitle("Add Medication")
                 .setView(layout)
                 .setPositiveButton("Save") { _, _ ->
 
-                    val db = dbHelper.writableDatabase
-
-                    db.execSQL(
-                        """
-                        INSERT INTO medications (animal_id, name, dosage, date, type)
-                        VALUES (?, ?, ?, ?, ?)
-                        """.trimIndent(),
-                        arrayOf(
-                            animalId,
-                            inputName.text.toString(),
-                            inputDose.text.toString(),
-                            inputDate.text.toString(),
-                            "Medicine"
-                        )
+                    dbHelper.insertMedication(
+                        animalId,
+                        inputName.text.toString(),
+                        inputDose.text.toString(),
+                        inputDate.text.toString(),
+                        "Medicine"
                     )
 
                     loadMedications(animalId)
@@ -97,9 +94,7 @@ class PetProfileActivity : AppCompatActivity() {
         }
     }
 
-    // =========================
-    // LOAD ANIMAL INFO
-    // =========================
+    // ================= ANIMAL INFO =================
     private fun loadAnimalInfo() {
 
         val db = dbHelper.readableDatabase
@@ -118,18 +113,15 @@ class PetProfileActivity : AppCompatActivity() {
         cursor.close()
     }
 
-    // =========================
-    // LOAD MEDICATIONS
-    // =========================
+    // ================= MEDICATIONS =================
     private fun loadMedications(animalId: Int) {
 
         val list = ArrayList<Medication>()
-
         val db = dbHelper.readableDatabase
 
         val cursor = db.rawQuery(
             """
-            SELECT med_id, animal_id, name, dosage, date, type
+            SELECT med_id, name, dosage, date, type
             FROM medications
             WHERE animal_id=?
             ORDER BY date DESC
@@ -141,21 +133,50 @@ class PetProfileActivity : AppCompatActivity() {
             list.add(
                 Medication(
                     id = cursor.getInt(0),
-                    name = cursor.getString(2),
-                    dosage = cursor.getString(3),
-                    date = cursor.getString(4),
-                    type = cursor.getString(5)
+                    name = cursor.getString(1),
+                    dosage = cursor.getString(2),
+                    date = cursor.getString(3),
+                    type = cursor.getString(4)
                 )
             )
         }
 
         cursor.close()
 
-        adapter = MedAdapter(list, dbHelper) {
+        medAdapter = MedAdapter(list, dbHelper) {
             loadMedications(animalId)
         }
 
-        recycler.layoutManager = LinearLayoutManager(this)
-        recycler.adapter = adapter
+        medRecycler.layoutManager = LinearLayoutManager(this)
+        medRecycler.adapter = medAdapter
+    }
+
+    // ================= RECORDS =================
+    private fun loadRecords(animalId: Int) {
+
+        val list = ArrayList<Record>()
+        val db = dbHelper.readableDatabase
+
+        val cursor = db.rawQuery(
+            "SELECT type, description, date FROM records WHERE animal_id=?",
+            arrayOf(animalId.toString())
+        )
+
+        while (cursor.moveToNext()) {
+            list.add(
+                Record(
+                    type = cursor.getString(0),
+                    description = cursor.getString(1),
+                    date = cursor.getString(2)
+                )
+            )
+        }
+
+        cursor.close()
+
+        recordAdapter = RecordAdapter(list)
+
+        recordRecycler.layoutManager = LinearLayoutManager(this)
+        recordRecycler.adapter = recordAdapter
     }
 }

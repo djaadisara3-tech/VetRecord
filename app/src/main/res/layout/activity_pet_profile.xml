@@ -82,6 +82,8 @@
             android:textSize="14sp" />
 
         <!-- MEDICAL RECORDS -->
+
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -91,6 +93,12 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recordRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="10dp"
+            android:nestedScrollingEnabled="false"/>
         <LinearLayout
             android:id="@+id/recordsContainer"
             android:layout_width="match_parent"
@@ -126,6 +134,7 @@
             android:src="@android:drawable/ic_input_add"
             app:backgroundTint="#8E6B8F"
             app:tint="#FFFFFF"/>
+
 
     </LinearLayout>
 

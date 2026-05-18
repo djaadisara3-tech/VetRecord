@@ -55,20 +55,22 @@ class MedAdapter(
         holder.menu.setOnClickListener {
 
             val popup = PopupMenu(holder.itemView.context, holder.menu)
-            popup.menu.add("Edit")
-            popup.menu.add("Delete")
+
+            popup.menu.add(0, 1, 0, "Edit")
+            popup.menu.add(0, 2, 1, "Delete")
 
             popup.setOnMenuItemClickListener { menuItem ->
 
-                when (menuItem.title) {
+                when (menuItem.itemId) {
 
-                    "Delete" -> {
+                    // DELETE
+                    2 -> {
                         dbHelper.deleteMedication(item.id)
                         refresh()
                     }
 
-                    "Edit" -> {
-
+                    // EDIT
+                    1 -> {
                         val context: Context = holder.itemView.context
 
                         val inputName = EditText(context)
